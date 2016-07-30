@@ -1,0 +1,50 @@
+# kind: Deployment
+# apiVersion: extensions/v1beta1
+# metadata:
+#   name: busybox
+# spec:
+#   containers:
+#     - name: test-container
+#       image: gcr.io/google_containers/busybox
+#       # command: [ "/bin/sh" ]
+#       # command: [ "/bin/sh", "cat config/.env" ]
+#       volumeMounts:
+#         - name: config-volume
+#           mountPath: /config
+#   volumes:
+#     - name: config-volume
+#       configMap:
+#         name: configuration
+#
+#
+
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: busybox
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+      - name: busybox
+        stdin: true
+        tty: true
+        image: gcr.io/google_containers/busybox
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+          - name: config-volume
+            mountPath: /config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: configuration
+            # items:
+            # - key: .env
+            #   path: /cd

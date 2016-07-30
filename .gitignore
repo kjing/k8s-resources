@@ -1,0 +1,10 @@
+*secrets.yml
+*secrets.yaml
+config.yml
+config.yaml
+configuration.yml
+configuration.yaml
+
+.DS_Store
+
+*.png
