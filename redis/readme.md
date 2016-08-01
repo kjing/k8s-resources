@@ -8,11 +8,11 @@ In general I am a bit old school and prefer to run data persistence / management
 
 Redis falls into this category.  It has it's own clustering and high availability functionality. In addition it requires very specific kernel parameters.  
 
-This recipe will deploy Redis in a very simple manner but will leverage the capabilities of Kubernetes for a reasonably available service.  We will run a single instance of Redis backed by persistent storage and both RDB and AOF data persistence models.  If Redis were to crash under this configuration at most one second of writes could be lost and Kubernetes will automatically restart Redis.  
+This recipe will deploy Redis in a very simple manner but will leverage the capabilities of Kubernetes for a reasonably available service.  We will run a single instance of Redis backed by persistent storage using both RDB and AOF data persistence models.  If Redis were to crash under this configuration at most one second of writes could be lost and Kubernetes will automatically restart Redis.
 
 ### Data Persistence
 
-Basically, we will use persistent storage for the disk that Redis will use. For example on Google you can easily create a persistent disk with this command:
+We need to use persistent storage for the disk that Redis will use. For example on Google you can easily create a persistent disk with this command:
 
 ```
 $ gcloud compute disks create --size 10GB redis-master
@@ -29,8 +29,6 @@ Redis offers two types of data persistence, RDB and AOF. The general indication 
 
 * Using AOF Redis is much more durable: you can have different fsync policies such as fsync every second, or fsync at every query. With the default policy of fsync every second write performance is still great and you can only lose one second worth of writes.
 * The AOF log is an append only log, so there are no seeks, nor corruption problems if there is a power outage. Even if the log ends with an half-written command for some reason (disk full or other reasons) the redis-check-aof tool is able to fix it easily.
-
-
 
 ### Kubernetes Versions
 
@@ -268,8 +266,3 @@ kubectl scale rc redis-sentinel --replicas=3
 # Delete the original master pod
 kubectl delete pods redis-master
 ```
-
-
-<!-- BEGIN MUNGE: GENERATED_ANALYTICS -->
-[![Analytics](https://kubernetes-site.appspot.com/UA-36037335-10/GitHub/examples/storage/redis/README.md?pixel)]()
-<!-- END MUNGE: GENERATED_ANALYTICS -->
