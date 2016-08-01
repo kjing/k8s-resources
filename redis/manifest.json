@@ -1,0 +1,12 @@
+{
+  "name": "Redis",
+  "icon": "https://hub.docker.com/public/images/official/redis.png",
+  "recipe": "https://raw.githubusercontent.com/dstroot/k8s-resources/master/redis/readme.md",
+  "description": "Get your taxes done right with TurboTax best-selling tax software.",
+  "author": "Dan Stroot",
+  "tags": [
+    "tax",
+    "refund",
+    "TurboTax"
+  ]
+}
