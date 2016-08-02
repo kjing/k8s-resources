@@ -28,7 +28,11 @@ spec:
     spec:
       containers:
       - name: ghost
+        # Uncomment below to allocate a tty if ever needed
+        # stdin: true
+        # tty: true
         image: ghost:0.9.0
+        imagePullPolicy: Always
         resources:  # http://kubernetes.io/docs/user-guide/compute-resources/
           requests:
             cpu: 100m
@@ -37,25 +41,23 @@ spec:
         - name: ghost
           containerPort: 2368
           protocol: TCP
-        env:
-        - name: NODE_ENV
-          value: production
-        - name: VIRTUAL_HOST
-          value: your.domain.tld
+        # env:
+        # - name: NODE_ENV
+        #   value: production
+        # - name: VIRTUAL_HOST
+        #   value: your.domain.tld
         # command: ["npm", "start", "--production"]
-        # volumeMounts:
-        # - name: ghost-config
-        #   mountPath: /var/lib/ghost
-        # - name: ghost-content
-        #   mountPath: /usr/src/ghost/content
-      volumes:
-      - name: ghost-content
-        gcePersistentDisk:
-          # This GCE persistent disk must already exist
-          pdName: ghost-content
-          fsType: ext4
-      - name: ghost-config
-        gcePersistentDisk:
-          # This GCE persistent disk must already exist
-          pdName: ghost-config
-          fsType: ext4
+      #   volumeMounts:
+      #   - name: ghost-config
+      #     mountPath: /var/lib/ghost
+      #   # - name: ghost-content
+      #   #   mountPath: /usr/src/ghost/content
+      # volumes:
+      # - name: ghost-content
+      #   gcePersistentDisk:
+      #     # This GCE persistent disk must already exist
+      #     pdName: ghost-content
+      #     fsType: ext4
+      # - name: ghost-config
+      #   configMap:
+      #     name: ghost
