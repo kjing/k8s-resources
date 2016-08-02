@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ghost
+spec:
+  selector:
+    app: ghost
+  type: LoadBalancer
+  ports:
+  - port: 80 # service port
+    targetPort: ghost  # port on container
+    protocol: TCP
+----
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ghost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghost
+  template:
+    metadata:
+      name: ghost
+      labels:
+        app: ghost
+    spec:
+      containers:
+      - name: ghost
+        image: ghost:0.9.0
+        resources:  # http://kubernetes.io/docs/user-guide/compute-resources/
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - name: ghost
+          containerPort: 2368
+          protocol: TCP
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: VIRTUAL_HOST
+          value: your.domain.tld
+        # command: ["npm", "start", "--production"]
+        # volumeMounts:
+        # - name: ghost-config
+        #   mountPath: /var/lib/ghost
+        # - name: ghost-content
+        #   mountPath: /usr/src/ghost/content
+      volumes:
+      - name: ghost-content
+        gcePersistentDisk:
+          # This GCE persistent disk must already exist
+          pdName: ghost-content
+          fsType: ext4
+      - name: ghost-config
+        gcePersistentDisk:
+          # This GCE persistent disk must already exist
+          pdName: ghost-config
+          fsType: ext4
