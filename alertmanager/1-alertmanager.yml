@@ -1,0 +1,46 @@
+# https://coreos.com/blog/prometheus-and-kubernetes-up-and-running.html
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+  labels:
+    name: alertmanager
+  name: alertmanager
+spec:
+  selector:
+    app: alertmanager
+  type: NodePort # LoadBalancer
+  ports:
+  - port: 9093 # the port that this service should serve on
+    targetPort: alertmanager  # port on container
+    protocol: TCP
+----
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: alertmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      name: alertmanager
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:master
+        ports:
+        - name: alertmanager
+          containerPort: 9093
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/alertmanager
+      volumes:
+      - name: config-volume
+        configMap:
+          name: alertmanager

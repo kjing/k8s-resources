@@ -31,9 +31,12 @@ gcloud compute disks create --size 200GB wordpress-disk
 # create persistent disks
 gcloud compute disks create --size 10GB sqlpad
 
+# Ghost
 gcloud compute disks create --size 200GB ghost-config
 gcloud compute disks create --size 200GB ghost-content
 
+# Grafana
+gcloud compute disks create --size 200GB grafana
 
 #################################################################
 #

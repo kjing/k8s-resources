@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  labels:
+    app: grafana
+  namespace: default
+spec:
+  type: LoadBalancer   # LoadBalancer or NodePort
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: grafana
+  sessionAffinity: None
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: grafana
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:3.1.1  # https://hub.docker.com/r/grafana/grafana/tags/
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+        - name: GF_SERVER_ROOT_URL
+          value: http://grafana.server.name
+          # Pass the plugins you want installed with the GF_INSTALL_PLUGINS
+          # environment variable as a comma separated list.
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-clock-panel,grafana-simple-json-datasource"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: password
+        volumeMounts:
+          - name: grafana-volume
+            mountPath: /var/lib/grafana
+      restartPolicy: Always
+      volumes:
+      - name: grafana-volume
+        gcePersistentDisk:
+          pdName: grafana  # GCE persistent disk must already exist
+          fsType: ext4
