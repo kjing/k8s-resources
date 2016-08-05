@@ -54,8 +54,8 @@ data:
         target_label: namespace
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-    - job_name: 'prometheus'
-        # Override the global default and scrape targets from this job every 5 seconds.
-        scrape_interval: 5s
-        static_configs:
-          - targets: ['localhost:9090']
+    # - job_name: 'prometheus'
+    #   # Override the global default and scrape targets from this job every 5 seconds.
+    #   scrape_interval: 5s
+    #   static_configs:
+    #     - targets: ['localhost:9090']
