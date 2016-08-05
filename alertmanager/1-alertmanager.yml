@@ -37,10 +37,10 @@ spec:
         ports:
         - name: alertmanager
           containerPort: 9093
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/alertmanager
-      volumes:
-      - name: config-volume
-        configMap:
-          name: alertmanager
+      #   volumeMounts:
+      #   - name: config-volume
+      #     mountPath: /etc/alertmanager
+      # volumes:
+      # - name: config-volume
+      #   configMap:
+      #     name: alertmanager

@@ -35,6 +35,9 @@ gcloud compute disks create --size 10GB sqlpad
 gcloud compute disks create --size 200GB ghost-config
 gcloud compute disks create --size 200GB ghost-content
 
+# Prometheus
+gcloud compute disks create --size 200GB prometheus
+
 # Grafana
 gcloud compute disks create --size 200GB grafana
 

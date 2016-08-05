@@ -35,7 +35,7 @@ spec:
       - name: prometheus
         image: prom/prometheus:0.19.2
         args:
-          - '-storage.local.retention=6h'
+          - '-storage.local.retention=72h'
           - '-storage.local.memory-chunks=500000'
           - '-config.file=/etc/prometheus/prometheus.yml'
           - '-alertmanager.url=http://alertmanager:9093' # need alertmanager setup
@@ -45,7 +45,14 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/prometheus
+        - name: prometheus
+          mountPath: /prometheus
       volumes:
       - name: config-volume
         configMap:
           name: prometheus
+      - name: prometheus
+        gcePersistentDisk:
+          # This GCE persistent disk must already exist
+          pdName: prometheus
+          fsType: ext4
