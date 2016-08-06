@@ -8,3 +8,6 @@ configuration.yaml
 .DS_Store
 
 *.png
+
+*.pem
+htpasswd

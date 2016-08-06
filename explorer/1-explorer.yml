@@ -57,10 +57,19 @@ spec:
         #     secretKeyRef:
         #       name: grafana-secret
         #       key: password
+      #   volumeMounts:
+      #   - name: config-volume
+      #     mountPath: /etc/prometheus
+      # volumes:
+      # - name: config-volume
+      #   configMap:
+      #     name: prometheus
+
         volumeMounts:
-        - name: config-volume
-          mountPath: /etc/prometheus
+        - name: authentication
+          mountPath: /etc/secrets
+          # readOnly: true
       volumes:
-      - name: config-volume
-        configMap:
-          name: prometheus
+      - name: authentication
+        secret:
+          secretName: nginx-secret

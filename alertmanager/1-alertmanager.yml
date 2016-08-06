@@ -33,14 +33,24 @@ spec:
     spec:
       containers:
       - name: alertmanager
-        image: prom/alertmanager:master
+        image: prom/alertmanager:stable
+        args:
+          - '-config.file=/etc/alertmanager/config.yml'
+          - '-storage.path=/alertmanager'
         ports:
         - name: alertmanager
           containerPort: 9093
-      #   volumeMounts:
-      #   - name: config-volume
-      #     mountPath: /etc/alertmanager
-      # volumes:
-      # - name: config-volume
-      #   configMap:
-      #     name: alertmanager
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/alertmanager
+        - name: alertmanager
+          mountPath: /prometheus
+      volumes:
+      - name: config-volume
+        configMap:
+          name: alertmanager
+      - name: alertmanager
+        gcePersistentDisk:
+          # This GCE persistent disk must already exist
+          pdName: alertmanager
+          fsType: ext4
