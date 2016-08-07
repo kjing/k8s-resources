@@ -10,6 +10,10 @@ metadata:
 spec:
   selector:
     app: prometheus
+  # You should not use a load balancer with external access.
+  # Prometheus alone does not have any security. You should use
+  # NodePort and proxy access using NGINX so you can set TLS
+  # termination and a password.
   type: LoadBalancer  # NodePort
   ports:
   - port: 80 # the port that this service should serve on

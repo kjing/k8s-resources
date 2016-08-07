@@ -10,7 +10,7 @@ spec:
   type: LoadBalancer
   ports:
   - port: 80 # service port
-    targetPort: 80  # port on container
+    targetPort: http  # port on container
     protocol: TCP
   # - port: 443 # service port
   #   targetPort: 443  # port on container
@@ -44,8 +44,8 @@ spec:
         - name: ENABLE_BASIC_AUTH
           value: "true"  # booleans and numbers must be quoted in env values
         ports:
-        # - name: http
-        - containerPort: 80
+        - name: http
+          containerPort: 80
         # # - name: https
         # - containerPort: 443
         volumeMounts:

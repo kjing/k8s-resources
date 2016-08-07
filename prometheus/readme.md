@@ -67,6 +67,27 @@ This recipe assumes that you have a Kubernetes cluster installed and running, an
 
 You can also test this using `minikube` if you have it installed locally.
 
+
+
+
+### Examples
+http://www.robustperception.io/understanding-machine-cpu-usage/
+
+overall value across all CPUs for the machine:
+
+`sum by (mode, instance) (irate(node_cpu{job="node-exporter"}[5m]))`
+
+calculate the percentage of CPU used, by subtracting the idle usage from 100%:
+
+`100 - (avg by (instance) (irate(node_cpu{job="node-exporter",mode="idle"}[5m])) * 100)`
+
+
+`prometheus_target_interval_length_seconds{quantile="0.99"}`
+
+
+
+
+
 ## References
 
 * [reference](http://puck.in/2016/05/getting-started-with-docker-compose-prometheus-alertmanager-blackbox-exporter-grafana/)

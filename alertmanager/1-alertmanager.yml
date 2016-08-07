@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: alertmanager
-        image: prom/alertmanager:stable
+        image: prom/alertmanager:latest
         args:
           - '-config.file=/etc/alertmanager/config.yml'
           - '-storage.path=/alertmanager'
