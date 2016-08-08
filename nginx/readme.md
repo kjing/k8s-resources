@@ -38,6 +38,14 @@ use that to self sign a certificate.
     ./setup-certs.sh /path/to/certs/folder
     ```
 
+    Then create secrets from the resulting files as follows:
+
+    ```shell
+    k create secret generic nginx-proxycert --from-file=./proxycert
+    k create secret generic nginx-proxykey --from-file=./proxykey
+    k create secret generic nginx-dhparam --from-file=./dhparam
+    ```
+
 1. **Create a DHE param**
 
     The nginx SSL configuration for this image requires that you generate your own DHE parameter. Here's the command:

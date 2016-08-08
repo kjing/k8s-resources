@@ -14,7 +14,7 @@ spec:
     protocol: TCP
   # - port: 443 # service port
   #   targetPort: 443  # port on container
-  #   protocol: TCP
+  #   # protocol: TCP
 ----
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -43,16 +43,60 @@ spec:
           value: prometheus
         - name: ENABLE_BASIC_AUTH
           value: "true"  # booleans and numbers must be quoted in env values
+        # - name: ENABLE_SSL
+        #   value: "false"
         ports:
         - name: http
           containerPort: 80
-        # # - name: https
+        # - name: https
         # - containerPort: 443
         volumeMounts:
         - name: authentication
           mountPath: /etc/secrets
           readOnly: true
+        # - name: proxycert
+        #   mountPath: /etc/secrets/proxycert
+        #   readOnly: true
+        # - name: proxykey
+        #   mountPath: /etc/secrets/proxykey
+        #   readOnly: true
+        # - name: dhparam
+        #   mountPath: /etc/secrets/dhparam
+        #   readOnly: true
+        # - name: nginx-certs
+        #   mountPath: /etc/secrets
+        #   readOnly: false
+        # - name: nginx-vhosts
+        #   mountPath: /etc/secrets
+        #   readOnly: false
+        # - name: nginx-html
+        #   mountPath: /etc/secrets
+        #   readOnly: false
       volumes:
       - name: authentication
         secret:
           secretName: nginx-secret
+      # - name: proxycert
+      #   secret:
+      #     secretName: nginx-proxycert
+      # - name: proxykey
+      #   secret:
+      #     secretName: nginx-proxykey
+      # - name: dhparam
+      #   secret:
+      #     secretName: nginx-dhparam
+      # - name: nginx-certs
+      #   gcePersistentDisk:
+      #     # This GCE persistent disk must already exist
+      #     pdName: nginx-certs
+      #     fsType: ext4
+      # - name: nginx-vhosts
+      #   gcePersistentDisk:
+      #     # This GCE persistent disk must already exist
+      #     pdName: nginx-vhosts
+      #     fsType: ext4
+      # - name: nginx-html
+      #   gcePersistentDisk:
+      #     # This GCE persistent disk must already exist
+      #     pdName: nginx-html
+      #     fsType: ext4

@@ -5,7 +5,12 @@ metadata:
 data:
   prometheus.yml: |-
     global:
-      scrape_interval: 15s
+      scrape_interval:     15s # By default, scrape targets every 15 seconds.
+      evaluation_interval: 15s # Evaluate rules every 15 seconds.
+
+    rule_files:
+    - 'prometheus.rules'
+
     scrape_configs:
     # etcd lives outside of our cluster and we configure it directly.
     # Not doing this on GKE because there is no access to etcd.
@@ -59,3 +64,9 @@ data:
     #   scrape_interval: 5s
     #   static_configs:
     #     - targets: ['localhost:9090']
+  prometheus.rules: |-
+    job_service:rpc_durations_microseconds_count:avg_rate5m = avg(rate(rpc_durations_microseconds_count[5m])) by (job, service)
+  prometheus.alerts: |-
+    ALERT InstanceDown
+      IF up{job="node-exporter"} = 0
+      FOR 10m
