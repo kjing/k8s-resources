@@ -92,3 +92,13 @@ calculate the percentage of CPU used, by subtracting the idle usage from 100%:
 
 * [reference](http://puck.in/2016/05/getting-started-with-docker-compose-prometheus-alertmanager-blackbox-exporter-grafana/)
 * [Authentication](http://www.robustperception.io/adding-basic-auth-to-prometheus-with-nginx/)
+* [Setup](https://www.ctl.io/developers/blog/post/monitoring-docker-services-with-prometheus/)
+
+
+https://www.ctl.io/developers/blog/post/monitoring-docker-services-with-prometheus/
+
+http://www.robustperception.io/blog/
+
+http://thenewstack.io/contributing-prometheus-history-alertmanager/
+
+https://prometheus.io/docs/alerting/overview/
