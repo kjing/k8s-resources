@@ -78,6 +78,22 @@ data:
     #   [ LABELS <label set> ]
     #   [ ANNOTATIONS <label set> ]
 
+    # http://www.robustperception.io/reduce-noise-from-disk-space-alerts/
+    ALERT DiskWillFillIn4Hours
+      IF predict_linear(node_filesystem_free{job='node-exporter'}[1h], 4*3600) < 0
+      FOR 5m
+      LABELS {
+        severity="slack"
+      }
+
+    # Alert if CPU is higher than 90% for 5m
+    ALERT HighCPU
+      IF (100 - (avg by (instance) (irate(node_cpu{job="node",mode="idle"}[5m])) * 100)) > .9
+      FOR 5m
+      LABELS {
+        severity="slack"
+      }
+
     # Alert for any instance that is unreachable for >5 minutes.
     ALERT InstanceDown
       IF up == 0
@@ -110,3 +126,8 @@ data:
     # Testing to generate alerts
     ALERT SlowHTTPRequest
       IF http_request_duration_microseconds{job="prometheus",name="prometheus",quantile="0.9"} > 5000
+      LABELS { severity = "slack" }
+      ANNOTATIONS {
+        summary = "Slow HTTP Request",
+        description = "Slow HTTP Request",
+      }

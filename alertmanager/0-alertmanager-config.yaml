@@ -42,11 +42,11 @@ data:
       # if it has not been updated.
       resolve_timeout: 5m
 
-      # # The smarthost and SMTP sender used for mail notifications.
-      # smtp_smarthost: 'localhost:25'
-      # smtp_from: 'alertmanager@example.org'
-      # smtp_auth_username: 'alertmanager'
-      # smtp_auth_password: 'password'
+      # The smarthost and SMTP sender used for mail notifications.
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'dan.stroot@gmail.com'
+      smtp_auth_username: 'dan.stroot@gmail.com'
+      smtp_auth_password: 'jutiluignxccjiyz'
 
       # The API URL to use for Slack notifications.
       slack_api_url: 'https://hooks.slack.com/services/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'
@@ -102,40 +102,41 @@ data:
       - match:
           severity: slack
         receiver: slack_alert
+      - match:
+          severity: email
+        receiver: email_alert
 
     receivers:
     - name: 'default'
       slack_configs:
-      - api_url: 'https://hooks.slack.com/services/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'
-        channel: '#alerts'
+      - channel: '#alerts'
+
     - name: 'slack_alert'
       slack_configs:
-      - api_url: 'https://hooks.slack.com/services/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'
-        channel: '#alerts'
+      - channel: '#alerts'
 
-      # # Whether or not to notify about resolved alerts.
-      # [ send_resolved: <boolean> | default = false ]
-      #
-      # # The Slack webhook URL.
-      # [ api_url: <string> | default = global.slack_api_url ]
-      #
-      # # The channel or user to send notifications to.
-      # channel: <tmpl_string>
-      #
-      # # API request data as defined by the Slack webhook API.
-      # [ color: <tmpl_string> | default = '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}' ]
-      # [ username: <tmpl_string> | default = '{{ template "slack.default.username" . }}'
-      # [ title: <tmpl_string> | default = '{{ template "slack.default.title" . }}' ]
-      # [ title_link: <tmpl_string> | default = '{{ template "slack.default.titlelink" . }}' ]
-      # [ icon_emoji: <tmpl_string> ]
-      # [ pretext: <tmpl_string> | default = '{{ template "slack.default.pretext" . }}' ]
-      # [ text: <tmpl_string> | default = '{{ template "slack.default.text" . }}' ]
-      # [ fallback: <tmpl_string> | default = '{{ template "slack.default.fallback" . }}' ]
+        # # Whether or not to notify about resolved alerts.
+        # send_resolved: true
+        #
+        # # The Slack webhook URL.
+        # [ api_url: <string> | default = global.slack_api_url ]
+        #
+        # # The channel or user to send notifications to.
+        # channel: <tmpl_string>
+        #
+        # # API request data as defined by the Slack webhook API.
+        # [ color: <tmpl_string> | default = '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}' ]
+        # [ username: <tmpl_string> | default = '{{ template "slack.default.username" . }}'
+        # [ title: <tmpl_string> | default = '{{ template "slack.default.title" . }}' ]
+        # [ title_link: <tmpl_string> | default = '{{ template "slack.default.titlelink" . }}' ]
+        # [ icon_emoji: <tmpl_string> ]
+        # [ pretext: <tmpl_string> | default = '{{ template "slack.default.pretext" . }}' ]
+        # [ text: <tmpl_string> | default = '{{ template "slack.default.text" . }}' ]
+        # [ fallback: <tmpl_string> | default = '{{ template "slack.default.fallback" . }}' ]
 
-
-
-
-
+    - name: 'email_alert'
+      email_configs:
+      - to: 'dan.stroot@gmail.com'
 
 
     #
