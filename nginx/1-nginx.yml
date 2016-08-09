@@ -9,12 +9,12 @@ spec:
     app: nginx
   type: LoadBalancer
   ports:
-  - port: 80 # service port
-    targetPort: http  # port on container
+  # - port: 80 # service port
+  #   targetPort: 80  # port on container
+  #   protocol: TCP
+  - port: 443 # service port
+    targetPort: 443  # port on container
     protocol: TCP
-  # - port: 443 # service port
-  #   targetPort: 443  # port on container
-  #   # protocol: TCP
 ----
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -40,16 +40,16 @@ spec:
             memory: 100Mi
         env:
         - name: TARGET_SERVICE
-          value: prometheus
+          value: prometheus:80
         - name: ENABLE_BASIC_AUTH
           value: "true"  # booleans and numbers must be quoted in env values
-        # - name: ENABLE_SSL
-        #   value: "false"
+        - name: ENABLE_SSL
+          value: "true"
         ports:
-        - name: http
-          containerPort: 80
+        # - name: http
+        # - containerPort: 80
         # - name: https
-        # - containerPort: 443
+        - containerPort: 443
         volumeMounts:
         - name: authentication
           mountPath: /etc/secrets
@@ -75,7 +75,7 @@ spec:
       volumes:
       - name: authentication
         secret:
-          secretName: nginx-secret
+          secretName: nginx-secrets
       # - name: proxycert
       #   secret:
       #     secretName: nginx-proxycert

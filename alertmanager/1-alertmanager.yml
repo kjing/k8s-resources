@@ -10,7 +10,10 @@ metadata:
 spec:
   selector:
     app: alertmanager
-  type: NodePort # LoadBalancer
+  type: LoadBalancer # NodePort
+  # loadBalancerSourceRanges:
+  # - "10.180.0.0/16"
+  # - "10.245.0.0/24"
   ports:
   - port: 9093 # the port that this service should serve on
     targetPort: alertmanager  # port on container

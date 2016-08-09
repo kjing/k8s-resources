@@ -35,29 +35,7 @@ You can also test this using [Minikube](https://github.com/kubernetes/minikube) 
 use that to self sign a certificate.
 
     ```shell
-    ./setup-certs.sh /path/to/certs/folder
-    ```
-
-    Then create secrets from the resulting files as follows:
-
-    ```shell
-    k create secret generic nginx-proxycert --from-file=./proxycert
-    k create secret generic nginx-proxykey --from-file=./proxykey
-    k create secret generic nginx-dhparam --from-file=./dhparam
-    ```
-
-1. **Create a DHE param**
-
-    The nginx SSL configuration for this image requires that you generate your own DHE parameter. Here's the command:
-
-    ```shell
-    openssl dhparam -out /path/to/secrets/dhparam.pem 2048
-    ```
-
-    Then create a Kubernetes secret to store it:
-
-    ```shell
-    k create secret generic dhparam --from-file=./dhparam.pem
+    ./setup-certs.sh /secrets  
     ```
 
 2. **Create a user name and password**
@@ -65,51 +43,26 @@ use that to self sign a certificate.
     Use this command to create a user ID and password:
 
     ```shell
-    htpasswd -nb YOUR_USERNAME SUPER_SECRET_PASSWORD > /path/to/secrets/htpasswd
+    htpasswd -nb YOUR_USERNAME SUPER_SECRET_PASSWORD > /secrets
     ```
 
-    Then create a Kubernetes secret to store it:
+3. **Store the files in a Kubernetes secret**
+
+    Then create a Kubernetes secret to store them:
 
     ```shell
-    k create secret generic nginx-secret --from-file=./htpasswd
+    cd secrets
+    kubectl create secret generic nginx-secrets --from-file=./proxycert --from-file=./proxykey --from-file=./dhparam --from-file=./htpasswd
     ```
 
-2. **Launch a Container**
+4. **Download .yml file and modify it to point to the service you want to proxy**
 
-    Modify the below command to include the actual address or host name you want to proxy to, as well as the correct /path/to/secrets for your certificate, key, and dhparam:
-
-    ```shell
-    docker run \
-      -e ENABLE_SSL=true \
-      -e TARGET_SERVICE=THE_ADDRESS_OR_HOST_YOU_ARE_PROXYING_TO \
-      -v /path/to/secrets/cert.crt:/etc/secrets/proxycert \
-      -v /path/to/secrets/key.pem:/etc/secrets/proxykey \
-      -v /path/to/secrets/dhparam.pem:/etc/secrets/dhparam \
-      nginx-ssl-proxy
-    ```
-    The really important thing here is that you map in your cert to `/etc/secrets/proxycert`, your key to `/etc/secrets/proxykey`, and your dhparam to `/etc/secrets/dhparam` as shown in the command above.
-
-3. **Enable Basic Access Authentication**
-
-    Create an htpaddwd file:
-
-    ```shell
-    htpasswd -nb YOUR_USERNAME SUPER_SECRET_PASSWORD > /path/to/secrets/htpasswd
+    ```yml
+    env:
+      - name: TARGET_SERVICE
+        value: prometheus:80   <- Modify this to point to your service inside the Kubernetes cluster
     ```
 
-    Launch the container, enabling the feature and mapping in the htpasswd file:
-
-    ```shell
-    docker run \
-      -e ENABLE_SSL=true \
-      -e ENABLE_BASIC_AUTH=true \
-      -e TARGET_SERVICE=THE_ADDRESS_OR_HOST_YOU_ARE_PROXYING_TO \
-      -v /path/to/secrets/cert.crt:/etc/secrets/proxycert \
-      -v /path/to/secrets/key.pem:/etc/secrets/proxykey \
-      -v /path/to/secrets/dhparam.pem:/etc/secrets/dhparam \
-      -v /path/to/secrets/htpasswd:/etc/secrets/htpasswd \
-      nginx-ssl-proxy
-    ```
 4. **Add additional nginx config**
 
    All *.conf from [nginx/extra](nginx/extra) are added during *built* to **/etc/nginx/extra-conf.d** and get included on startup of the container. Using volumes you can overwrite them on *start* of the container:
@@ -143,7 +96,7 @@ use that to self sign a certificate.
 
 
 
-## References
+#### References
 * [](https://github.com/GoogleCloudPlatform/nginx-ssl-proxy)
 * [](https://github.com/GoogleCloudPlatform/kube-jenkins-imager)
 * [](https://mozilla.github.io/server-side-tls/ssl-config-generator/)

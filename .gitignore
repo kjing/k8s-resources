@@ -11,3 +11,6 @@ configuration.yaml
 
 *.pem
 htpasswd
+
+
+certs/
