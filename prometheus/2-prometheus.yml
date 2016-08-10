@@ -14,7 +14,7 @@ spec:
   # Prometheus alone does not have any security. You should use
   # NodePort and proxy access using NGINX so you can set TLS
   # termination and a password.
-  type: LoadBalancer  # NodePort
+  type: NodePort  # NodePort LoadBalancer
   ports:
   - port: 80 # the port that this service should serve on
     targetPort: prometheus  # port on container
@@ -37,15 +37,22 @@ spec:
     spec:
       containers:
       - name: prometheus
-        image: prom/prometheus:0.19.2
+        image: prom/prometheus:v1.0.1
         args:
           - '-storage.local.retention=72h'
-          - '-storage.local.memory-chunks=500000'
+          # - '-storage.local.memory-chunks=500000'
           - '-config.file=/etc/prometheus/prometheus.yml'
           - '-alertmanager.url=http://alertmanager:9093' # need alertmanager setup
         ports:
         - name: prometheus
           containerPort: 9090
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 500m
+            memory: 2500Mi
         volumeMounts:
         - name: config-volume
           mountPath: /etc/prometheus

@@ -84,12 +84,27 @@ calculate the percentage of CPU used, by subtracting the idle usage from 100%:
 
 `prometheus_target_interval_length_seconds{quantile="0.99"}`
 
+Get the memory usage of a specific container
+`container_memory_usage_bytes{image='ghost:0.9.0'}`
 
+Any version:
+`container_memory_usage_bytes{image=~'ghost:.*'}`
 
+How much memory are the tools in the kube-system namespace using? That’s a question you can answer with a query like:
+`sum(container_memory_usage_bytes{kubernetes_namespace="kube-system"})`
 
+Container metrics are labeled by pod, as well as by namespace, so you can break down your results by individual pods using the by operator:
+`sum by(kubernetes_pod_name) (container_memory_usage_bytes{kubernetes_namespace="kube-system"})`
+
+In Kubernetes, a single deployment or replication controller can be associated with multiple pods. To see all of the metrics associated with a particular deployment or replica set, you can use the pod naming convention and a regular expression to see all of the pods together. For example, all of the pods scheduled by the kube-dns-v17 ReplicationController will have names beginning with “kube-dns-v17-”. Since Prometheus supports regular expression queries, we can see the memory in use by our Kubernetes system DNS with:
+`sum(container_memory_usage_bytes{kubernetes_namespace="kube-system", kubernetes_pod_name=~"kube-dns-v17.*"})`
+
+There are also Kubernetes-specific metrics you can query – in particular, the API server and the Kubelet on each worker node exposes information in addition to the cAdvisor container metrics. For example, the API server reports its overall request count.
+`sum(rate(apiserver_request_count[1m]))`
 
 ## References
 
+* [Blog](https://coreos.com/blog/monitoring-kubernetes-with-prometheus.html)
 * [reference](http://puck.in/2016/05/getting-started-with-docker-compose-prometheus-alertmanager-blackbox-exporter-grafana/)
 * [Authentication](http://www.robustperception.io/adding-basic-auth-to-prometheus-with-nginx/)
 * [Setup](https://www.ctl.io/developers/blog/post/monitoring-docker-services-with-prometheus/)
