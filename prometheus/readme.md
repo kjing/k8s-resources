@@ -109,6 +109,7 @@ There are also Kubernetes-specific metrics you can query – in particular, the 
 * [Authentication](http://www.robustperception.io/adding-basic-auth-to-prometheus-with-nginx/)
 * [Setup](https://www.ctl.io/developers/blog/post/monitoring-docker-services-with-prometheus/)
 
+https://github.com/prometheus/prometheus/blob/v1.0.1/documentation/examples/prometheus-kubernetes.yml
 
 https://www.ctl.io/developers/blog/post/monitoring-docker-services-with-prometheus/
 

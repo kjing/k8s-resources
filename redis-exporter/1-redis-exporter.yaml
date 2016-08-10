@@ -8,10 +8,15 @@ spec:
     metadata:
       labels:
         app: redis-exporter
+      # If we annotate the pod properly then prometheus will
+      # discover it and automatically scrape it. Cool!s
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9121"
     spec:
       containers:
       - name: redis-exporter
-        image: 21zoo/redis_exporter
+        image: 21zoo/redis_exporter:0.5
         imagePullPolicy: Always  # IfNotPresent
         # env:
         # - name: REDIS_PASSWORD
@@ -26,18 +31,3 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-exporter
-  labels:
-    app: exporter
-spec:
-  type: NodePort
-  ports:
-  - port: 9121  # service port
-    targetPort: 9121 # container port
-    protocol: TCP
-  selector:
-    app: redis-exporter
