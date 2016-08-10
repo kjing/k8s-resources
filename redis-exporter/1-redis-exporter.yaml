@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-exporter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis-exporter
+    spec:
+      containers:
+      - name: redis-exporter
+        image: 21zoo/redis_exporter
+        imagePullPolicy: Always  # IfNotPresent
+        # env:
+        # - name: REDIS_PASSWORD
+        #   value: yoursecretpaswd
+        ports:
+        - containerPort: 9121
+          protocol: TCP
+        args:
+        - "--redis.addr"
+        - "redis:6379"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-exporter
+  labels:
+    app: exporter
+spec:
+  type: NodePort
+  ports:
+  - port: 9121  # service port
+    targetPort: 9121 # container port
+    protocol: TCP
+  selector:
+    app: redis-exporter
