@@ -4,7 +4,7 @@ metadata:
   name: kibana
   labels:
     app: kibana
-  namespace: default
+  # namespace: kube-system
 spec:
   type: LoadBalancer   # LoadBalancer or NodePort
   ports:
@@ -18,19 +18,21 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: kibana
+  # namespace: kube-system
 spec:
   replicas: 1
   template:
     metadata:
       labels:
         app: kibana
+      # namespace: kube-system
     spec:
       containers:
       - name: kibana
         image: kibana:4.5.4
         env:
         - name: ELASTICSEARCH_URL
-          value: "http://130.211.117.206"
+          value: "http://elasticsearch:9200"
         resources:
           requests:
             cpu: 100m

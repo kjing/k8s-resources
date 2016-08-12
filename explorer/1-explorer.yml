@@ -64,12 +64,12 @@ spec:
       # - name: config-volume
       #   configMap:
       #     name: prometheus
-
-        volumeMounts:
-        - name: authentication
-          mountPath: /etc/secrets
-          # readOnly: true
-      volumes:
-      - name: authentication
-        secret:
-          secretName: nginx-secret
+      #
+      #   volumeMounts:
+      #   - name: authentication
+      #     mountPath: /etc/secrets
+      #     # readOnly: true
+      # volumes:
+      # - name: authentication
+      #   secret:
+      #     secretName: nginx-secret
