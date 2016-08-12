@@ -44,10 +44,8 @@ gcloud compute disks create --size 200GB alertmanager
 # Grafana
 gcloud compute disks create --size 200GB grafana
 
-# Nginx
-gcloud compute disks create --size 10GB nginx-html
-gcloud compute disks create --size 10GB nginx-vhosts
-gcloud compute disks create --size 10GB nginx-certs
+# Elastic Search
+gcloud compute disks create --size 200GB elasticsearch
 
 #################################################################
 #
