@@ -1,0 +1,57 @@
+# This is a way to mount individual files inside a volume?
+# need to test.  Note the "subpath" key below. Could this be
+# used to inject the Ghost configuration?
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-single-file-volume-pod
+spec:
+  containers:
+  - name: test-container
+    image: gcr.io/google_containers/busybox
+    command: [ "/bin/sh", "-c", "cat /var/lib/ghost/config.js" ]
+    volumeMounts:
+    # - name: ghost
+    #   mountPath: /var/lib/ghost
+    - name: config-volume
+      mountPath: /var/lib/ghost
+      # subPath: config.js
+  volumes:
+  - name: ghost
+    gcePersistentDisk:
+      pdName: ghost-content
+      fsType: ext4
+  - name: config-volume
+    configMap:
+     name: ghost
+     items:
+     - key: config.js
+       path: config.js
+  restartPolicy: Never
+
+
+
+# This is a way to mount individual files inside a volume?
+# need to test.  Note the "subpath" key below. Could this be
+# used to inject the Ghost configuration?
+apiVersion: v1
+  kind: Pod
+  metadata:
+    name: config-single-file-volume-pod
+  spec:
+    containers:
+    - name: test-container
+      image: gcr.io/google_containers/busybox
+      command: [ "/bin/sh", "-c", "cat /etc/special-key" ]
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/special-key
+        subPath: path/to/special-key
+    volumes:
+    - name: config-volume
+      configMap:
+       name: test-configmap
+       items:
+       - key: data-1
+         path: path/to/special-key
+    restartPolicy: Never

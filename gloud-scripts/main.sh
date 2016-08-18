@@ -47,6 +47,8 @@ gcloud compute disks create --size 200GB grafana
 # Elastic Search
 gcloud compute disks create --size 200GB elasticsearch
 
+gcloud compute disks create --size 10gb letsencrypt
+
 #################################################################
 #
 #      CLEANUP - Uncomment below

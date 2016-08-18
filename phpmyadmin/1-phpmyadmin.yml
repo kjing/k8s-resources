@@ -6,8 +6,9 @@ spec:
   selector:
     app: phpmyadmin
   type: LoadBalancer
+  loadBalancerIP: 130.211.126.76
   ports:
-  - port: 80 # service port
+  - port: 8080 # service port
     targetPort: http-server  # port on container
     protocol: TCP
 ----
@@ -17,12 +18,8 @@ metadata:
   name: phpmyadmin
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: phpmyadmin
   template:
     metadata:
-      name: phpmyadmin
       labels:
         app: phpmyadmin
     spec:
