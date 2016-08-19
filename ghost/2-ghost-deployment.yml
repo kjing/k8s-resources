@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ghost
-        image: dstroot/ghost4kubernetes:0.9.0  #ghost:0.9.0
+        image: ghost:0.9.0
         imagePullPolicy: Always
         resources:  # http://kubernetes.io/docs/user-guide/compute-resources/
           requests:
@@ -51,17 +51,16 @@ spec:
           value:
         - name: MAIL_FROM
           value: "\"Custom Name\" <myemail@address.com>"
-        # command: ["npm", "start", "--production"]
-        # volumeMounts:
-        # - name: ghost
-        #   mountPath: /var/lib/ghost
-        # - name: ghost-config
-        #   mountPath: /var/lib/ghost
-      # volumes:
-      # - name: ghost
-      #   gcePersistentDisk:
-      #     pdName: ghost
-      #     fsType: ext4
-      # - name: ghost-config
-      #   configMap:
-      #     name: ghost
+        volumeMounts:
+        - name: ghost
+          mountPath: /var/lib/ghost/content
+        - name: ghost-config
+          mountPath: /var/lib/ghost
+      volumes:
+      - name: ghost
+        gcePersistentDisk:
+          pdName: ghost
+          fsType: ext4
+      - name: ghost-config
+        configMap:
+          name: ghost

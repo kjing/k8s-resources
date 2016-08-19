@@ -33,8 +33,8 @@ spec:
     spec:
       containers:
       - name: ghost
-        image: dstroot/ghost4kubernetes:0.9.0  #ghost:0.9.0
-        # imagePullPolicy: Always
+        image: ghost:0.9.0
+        imagePullPolicy: Always
         resources:  # http://kubernetes.io/docs/user-guide/compute-resources/
           requests:
             cpu: 100m
@@ -45,7 +45,7 @@ spec:
           protocol: TCP
         env:
         - name: NODE_ENV
-          value: production
+          value: production # development # production
         - name: DATABASE_TYPE
           value: mysql
         - name: DATABASE_HOST
@@ -60,7 +60,7 @@ spec:
         - name: DATABASE_DB
           value: ghost
         - name: GHOST_URL
-          value: kube.recipes
+          value: "http://kube.recipes"
         - name: MAIL_SERVICE  # 'Gmail', 'SES', 'Mailgun'
           value: Gmail
         - name: MAIL_USERNAME
@@ -69,18 +69,16 @@ spec:
           value:
         - name: MAIL_FROM
           value: "\"Custom Name\" <myemail@address.com>"
-        command: ["npm", "start", "--production"]
-        # volumeMounts:
-        # - name: ghost
-        #   mountPath: /var/lib/ghost
-        # - name: ghost-config
-        #   mountPath: /var/lib/ghost
-        #   subPath: /
-      # volumes:
-      # - name: ghost
-      #   gcePersistentDisk:
-      #     pdName: ghost
-      #     fsType: ext4
-      # - name: ghost-config
-      #   configMap:
-      #     name: ghost
+        volumeMounts:
+        - name: ghost
+          mountPath: /var/lib/ghost/content
+        - name: ghost-config
+          mountPath: /var/lib/ghost
+      volumes:
+      - name: ghost
+        gcePersistentDisk:
+          pdName: ghost
+          fsType: ext4
+      - name: ghost-config
+        configMap:
+          name: ghost
