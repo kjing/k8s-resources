@@ -34,7 +34,7 @@ spec:
       containers:
       - name: ghost
         image: ghost:0.9.0
-        imagePullPolicy: Always
+        # imagePullPolicy: Always
         resources:  # http://kubernetes.io/docs/user-guide/compute-resources/
           requests:
             cpu: 100m
@@ -61,14 +61,16 @@ spec:
           value: ghost
         - name: GHOST_URL
           value: "http://kube.recipes"
+        - name: MAIL_TRANSPORT
+          value: SMTP  # SES
         - name: MAIL_SERVICE  # 'Gmail', 'SES', 'Mailgun'
           value: Gmail
         - name: MAIL_USERNAME
-          value:
+          value: "sbtpg.lajolla@gmail.com"
         - name: MAIL_PASSWORD
-          value:
+          value: aa853127
         - name: MAIL_FROM
-          value: "\"Custom Name\" <myemail@address.com>"
+          value: "\"Dan Stroot\" <dan.stroot@gmail.com>"  # "\"My Name\" <myemail@address.com>"
         volumeMounts:
         - name: ghost
           mountPath: /var/lib/ghost/content

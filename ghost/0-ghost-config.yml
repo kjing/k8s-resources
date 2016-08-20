@@ -4,157 +4,111 @@ metadata:
   name: ghost
 data:
   config.js: |
-    // Ghost Configuration
-    // Documentation can be found at http://docs.ghost.org/usage/configuration/
+    // Dynamic config.js for Ghost
+    console.log('Starting Ghost using dynamic config...');
 
-    var path = require('path'),
-        config;
+    var config,
+        url = require('url'),
+        path = require('path');
+
+    // check for a URL setup
+    function getUrl() {
+      if (process.env.GHOST_URL) {
+        return process.env.GHOST_URL;
+      } else {
+        console.log("Please set the GHOST_URL environment variable for your blog's URL");
+        return 'http://localhost:2368';
+      }
+    }
+
+    // setup environment variables for your database configuration or
+    // it will default to a local SQLite installation
+    function getDatabase() {
+      if (process.env.DATABASE_TYPE) {
+        return {
+          client: process.env.DATABASE_TYPE,  // 'mysql' or 'pg'
+          connection: {
+            host     : process.env.DATABASE_HOST, // IP or DNS
+            user     : process.env.DATABASE_USER,
+            password : process.env.DATABASE_PASS,
+            database : process.env.DATABASE_DB,   // ghost
+            charset  : 'utf8'
+          }
+        };
+      } else {
+        console.log(' - Using SQLite Ghost database.');
+        return {
+          client: 'sqlite3',
+          connection: {
+            filename: path.join(process.env.GHOST_CONTENT, '/content/data/ghost.db')
+          },
+          debug: false
+        };
+      }
+    }
+
+    // Setup environment variables for your mail service.  Mail service will
+    // be setup if a 'MAIL_TRANSPORT' environment variable is set.
+    function getMailConfig() {
+      if (process.env.MAIL_TRANSPORT) {
+
+        var options = {};
+        options.auth = {};
+
+        if (process.env.MAIL_SERVICE) {
+          options.service = process.env.MAIL_SERVICE;
+        }
+        if (process.env.MAIL_HOST) {
+          options.host = process.env.MAIL_HOST;
+        }
+        if (process.env.MAIL_PORT) {
+          options.port = process.env.MAIL_PORT;
+        }
+        if (process.env.MAIL_SSL) {
+          options.secureConnection = process.env.MAIL_SSL;
+        }
+        if (process.env.MAIL_USERNAME) {
+          options.auth.user = process.env.MAIL_USERNAME;
+        }
+        if (process.env.MAIL_PASSWORD) {
+          options.auth.pass = process.env.MAIL_PASSWORD;
+        }
+        if (process.env.MAIL_FROM) {
+          var from = process.env.MAIL_FROM;
+        }
+        return {
+            transport: process.env.MAIL_TRANSPORT,
+            options: options,
+            from: from
+        };
+      }
+    }
 
     config = {
-        production: {
-            url: process.env.GHOST_URL,
-            // forceAdminSSL: process.env.PROD_FORCE_ADMIN_SSL,
-            mail: {
-                transport: 'SMTP',
-                options: {
-                    service: process.env.MAIL_SERVICE,  // 'Gmail', 'SES', 'Mailgun'
-                    // host: process.env.MAIL_HOST,
-                    // secureConnection: process.env.MAIL_SSL,
-                    // port: process.env.MAIL_PORT,
-                    auth: {
-                        user: process.env.MAIL_USERNAME,
-                        pass: process.env.MAIL_PASSWORD,
-                    },
-                },
-                from: process.env.MAIL_FROM
-            },
-            database: {
-              client: process.env.DATABASE_TYPE,  // 'mysql' or 'pg'
-              connection: {
-                host     : process.env.DATABASE_HOST,
-                user     : process.env.DATABASE_USER,
-                password : process.env.DATABASE_PASS,
-                database : process.env.DATABASE_DB,
-                charset  : 'utf8'
-              }
-            },
-            server: {
-                host: '0.0.0.0',
-                port: '2368'
-            },
-            paths: {
-                contentPath: path.join(process.env.GHOST_CONTENT, '/content/')
-            }
+      production: {
+        url: getUrl(),
+        database: getDatabase(),
+        mail: getMailConfig(),
+        server: {
+          host: '0.0.0.0',
+          port: '2368'
         },
-
-        // standard ghost development configuration
-        development: {
-            url: 'http://localhost:2368',
-            database: {
-                client: 'sqlite3',
-                connection: {
-                    filename: path.join(__dirname, '/content/data/ghost-dev.db')
-                },
-                debug: false
-            },
-            server: {
-                host: '127.0.0.1',
-                port: '2368'
-            },
-            paths: {
-                contentPath: path.join(__dirname, '/content/')
-            }
+        paths: {
+          contentPath: path.join(process.env.GHOST_CONTENT, '/content/')
         }
+      },
+      development: {
+        url: getUrl(),
+        database: getDatabase(),
+        mail: getMailConfig(),
+        server: {
+          host: '0.0.0.0',
+          port: '2368'
+        },
+        paths: {
+          contentPath: path.join(process.env.GHOST_CONTENT, '/content/')
+        }
+      },
     };
 
     module.exports = config;
-
-
-
-# // Dynamic config.js for Ghost modified from: https://gist.github.com/mewm/778644a11b0f28670fe4
-# //
-# // When using mysql, the MYSQL_* environment variables will be made available automatically
-# // by the Docker linking system
-#
-# // Include any custom additions
-#
-# console.log('Starting Ghost using dynamic config... :)')
-#
-# var config,
-#     url = require('url'),
-#     path = require('path');
-#
-# function getDatabase() {
-#   var db_config = {};
-#   // If we've linked in a mysql container, then this environment variable should be set
-#   if (process.env['MYSQL_NAME']) {
-#     db_config['client'] = 'mysql';
-#   } else {
-#     return {
-#       client: 'sqlite3',
-#       connection: {
-#         filename: path.join(process.env.GHOST_CONTENT, '/data/ghost.db')
-#       },
-#       debug: false
-#     };
-#   }
-#   var db_uri = /^tcp:\/\/([\d.]+):(\d+)$/.exec(process.env['DB_PORT']);
-#   if (db_uri) {
-#     db_config['connection'] = {
-#       host: db_uri[1],
-#       port: db_uri[2]
-#     };
-#   } else {
-#     db_config['connection'] = {
-#       host: process.env['DB_HOST'] || 'mysql',
-#       port: process.env['DB_PORT'] || '3306'
-#     };
-#   }
-#   if (process.env['MYSQL_ENV_MYSQL_USER']) db_config['connection']['user'] = process.env['MYSQL_ENV_MYSQL_USER'];
-#   if (process.env['MYSQL_ENV_MYSQL_PASSWORD']) db_config['connection']['password'] = process.env['MYSQL_ENV_MYSQL_PASSWORD'];
-#   if (process.env['MYSQL_ENV_MYSQL_DATABASE']) db_config['connection']['database'] = process.env['MYSQL_ENV_MYSQL_DATABASE'];
-#   return db_config;
-# }
-#
-# function getMailConfig() {
-#   var mail_config = {}
-#   mail_config['options'] = {};
-#   mail_config['options']['auth'] = {};
-#   if (process.env['MAIL_TRANSPORT']){ mail_config['transport'] = process.env['MAIL_TRANSPORT'] };
-#   if (process.env['MAIL_SERVICE']) { mail_config['options']['service']   = process.env['MAIL_SERVICE'] }
-#   if (process.env['MAIL_USER']) { mail_config['options']['auth']['user'] = process.env['MAIL_USER'] }
-#   if (process.env['MAIL_PASS']) { mail_config['options']['auth']['pass'] = process.env['MAIL_PASS'] }
-#   return mail_config;
-# }
-# if (!process.env.URL) {
-#   console.log("Please set URL environment variable to your blog's URL");
-#   process.exit(1);
-# }
-#
-# config = {
-#   production: {
-#     url: process.env.URL,
-#     database: getDatabase(),
-#     mail: getMailConfig(),
-#     server: {
-#       host: '0.0.0.0',
-#       port: '2368'
-#     },
-#     paths: {
-#       contentPath: path.join(process.env.GHOST_CONTENT, '/')
-#     }
-#   },
-#   development: {
-#     url: process.env.URL,
-#     database: getDatabase(),
-#     mail: getMailConfig(),
-#     server: {
-#       host: '0.0.0.0',
-#       port: '2368'
-#     },
-#     paths: {
-#       contentPath: path.join(process.env.GHOST_CONTENT, '/')
-#     }
-#   },
-# };
-# module.exports = config;

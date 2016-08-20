@@ -7,8 +7,9 @@ metadata:
   namespace: default
 spec:
   type: LoadBalancer   # LoadBalancer or NodePort
+  loadBalancerIP: 130.211.126.76
   ports:
-  - port: 80
+  - port: 8081
     targetPort: 8080
     protocol: TCP
   selector:
