@@ -20,9 +20,10 @@ Official Image: [Ghost](https://hub.docker.com/_/ghost/)
 ##### Table of Contents
 
  * [Step Zero: Prerequisites](#step-zero)
- * [Step One: Setup some persistent disk](#step-one)
+ * [Step One: Setup a data volme](#step-one)
  * [Step Two: Create a Ghost ConfigMap](#step-two)
- * [Step Three: Deploy Ghost](#step-three)
+ * [Step Three: Create a Ghost service](#step-three)
+ * [Step four: Create a Ghost deployment](#step-four)
  * [Step Seven: View the guestbook](#step-seven)
  * [Step Eight: Cleanup](#step-eight)
 
@@ -34,13 +35,13 @@ You can also test this using `minikube` if you have it installed locally.
 
 **Tip:** View all the `kubectl` commands, including their options and descriptions in the [kubectl CLI reference](../../docs/user-guide/kubectl/kubectl.md).
 
-### Step One: Setup some persistent disk<a id="step-one"></a>
+### Step One: Setup a data volme <a id="step-one"></a>
 
 We will need some persistent disk to contain our blog content. We do not want to lose our content if our container restarts!  Covering all the variations of how to do this is outside the scope of this recipe.  This example shows how to do it on the Google Cloud Platform.
 
-[gcloud](https://cloud.google.com/sdk/docs/) is a tool that provides the primary command-line interface to Google Cloud Platform. You can use this tool to perform many common platform tasks either from the command-line, or in scripts and other automations. Use `gloud` to create a disk:
+[gcloud](https://cloud.google.com/sdk/docs/) is a tool that provides the primary command-line interface to Google Cloud Platform. You can use this tool to perform many common platform tasks either from the command-line, or in scripts and other automations. Use `gloud` to create a volume:
 
-```console
+```shell
 $ gcloud compute disks create --size 200GB ghost
 Created [https://www.googleapis.com/compute/v1/projects/theta-dialect-137923/zones/us-central1-b/disks/ghost].
 NAME    ZONE           SIZE_GB  TYPE         STATUS
@@ -59,16 +60,39 @@ Ghost uses a `config.js` file for configuration. We will use a Kubernetes Config
 
     Result: A configMap named "ghost" will be created so it can later be mounted into the Ghost Docker container.
 
-### Step Three: Deploy Ghost <a id="step-three"></a>
+### Step Three: Create a Ghost service <a id="step-three"></a>
 
-We will deploy Ghost by creating a Kubernetes service and a deployment.
+We will deploy Ghost by creating a Kubernetes service and a deployment. **NOTE:** You will have to adjust the environment variable values in the .yaml file before launch.  
 
-1. Use the file [redis-slave-controller.json](redis-slave-controller.json) to create the replication controller by running the `kubectl create -f` *`filename`* command:
+1. Use the file [1-ghost-service.yaml](1-ghost-service.yaml) to create the ghost service by running the `kubectl create -f` *`filename`* command:
 
     ```console
     $ kubectl create -f examples/guestbook-go/redis-slave-controller.json
     replicationcontrollers/redis-slave
     ```
+
+    This is the contents of the `1-ghost-service.yaml` file:
+
+    ```yaml
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: ghost
+      labels:
+        app: ghost
+    spec:
+      selector:
+        app: ghost
+      type: LoadBalancer
+      ports:
+      - port: 80
+        targetPort: ghost
+        protocol: TCP
+    ```
+
+    Result: The service is created with labels `app=ghost` to identify that the pods are running Ghost.  It will make a load balanced service available using all pods with that label.
+
+
 
 2. To verify that the redis-slave controller is running, run the `kubectl get rc` command:
 
@@ -141,7 +165,21 @@ redis-slave
 ```
 
 
-
+```console
+2016-08-20T14:04:43.193898245Z npm info it worked if it ends with ok
+2016-08-20T14:04:43.194498843Z npm info using npm@2.15.8
+2016-08-20T14:04:43.194890475Z npm info using node@v4.4.7
+2016-08-20T14:04:43.448797411Z npm info prestart ghost@0.9.0
+2016-08-20T14:04:43.453604818Z npm info start ghost@0.9.0
+2016-08-20T14:04:43.456022448Z
+2016-08-20T14:04:43.456036326Z > ghost@0.9.0 start /usr/src/ghost
+2016-08-20T14:04:43.456040462Z > node index
+2016-08-20T14:04:43.456043041Z
+2016-08-20T14:04:43.557252192Z Starting Ghost using dynamic config...
+2016-08-20T14:04:45.285795404Z Ghost is running in production...
+2016-08-20T14:04:45.285838378Z Your blog is now available on http://example.com
+2016-08-20T14:04:45.285842492Z Ctrl+C to shut down
+```
 
 
 

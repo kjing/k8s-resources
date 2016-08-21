@@ -36,8 +36,8 @@ spec:
         image: gcr.io/google_containers/busybox
         resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 50m
+            memory: 50Mi
         volumeMounts:
           - name: config-volume
             mountPath: /config
