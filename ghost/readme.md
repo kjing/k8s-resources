@@ -182,8 +182,12 @@ redis-slave
 ```
 
 
+#### Notes
 
+You can install themes by deleting the ghost deployment, starting another container and mounting the ghost disk into the container with git installed and use git to clone other themes into the themes directory: `/var/lib/ghost/content/themes`
 
+example command:
+`$ git clone https://github.com/oswaldoacauan/ghostium/ "ghostium"`
 
 
 

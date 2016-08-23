@@ -49,6 +49,8 @@ gcloud compute disks create --size 200GB elasticsearch
 
 gcloud compute disks create --size 10gb letsencrypt
 
+gcloud compute disks create --size 10gb vault
+
 #################################################################
 #
 #      CLEANUP - Uncomment below

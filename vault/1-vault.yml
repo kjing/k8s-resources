@@ -1,0 +1,57 @@
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: vault
+# spec:
+#   type: LoadBalancer   # LoadBalancer or NodePort
+#   loadBalancerIP: 130.211.126.76
+#   ports:
+#   - port: 8200
+#     targetPort: 8200
+#     protocol: TCP
+#   selector:
+#     app: vault
+# ---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: vault
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      containers:
+      - name: vault
+        # Note IPC_LOCK is required in order for Vault to lock
+        # memory, which prevents it from being swapped to disk.
+        # This is highly recommended for *security*.
+        securityContext:
+          capabilities:
+            add:
+            - IPC_LOCK
+        image: vault:v0.6.0  # https://hub.docker.com/_/vault/
+        args:
+        - server
+        ports:
+        - containerPort: 8200
+        resources:
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+          - name: vault-volume
+            mountPath: /vault/file
+          - name: vault-config
+            mountPath: /vault/config
+      restartPolicy: Always
+      volumes:
+      - name: vault-volume
+        gcePersistentDisk:
+          pdName: vault  # GCE persistent disk must already exist
+          fsType: ext4
+      - name: vault-config
+        configMap:
+          name: vault-config
