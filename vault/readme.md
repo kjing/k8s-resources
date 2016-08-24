@@ -38,8 +38,21 @@ This assumes that you have a Kubernetes cluster installed and running, and that 
 
 1. Configure a volume for persistent storage.  On Google's cloud this is a simple as:
     ```shell
-    gcloud compute disks create --size 10gb vault
+    $ gcloud compute disks create --size 10gb vault
     ```
+
+2. Create a cert locally:
+    ```shell
+    $ mkdir -p cert
+    $ openssl req -x509 -newkey rsa:2048 -nodes -keyout cert/vault.key -out cert/vault.crt -days 730 -subj "/CN=127.0.0.1:8200"
+    ```
+
+3. Then create a Kubernetes secret to store the cert:
+    ```shell
+    $ cd cert
+    $ kubectl create secret generic vault-cert --from-file=./vault.crt --from-file=./vault.key
+    ```
+
 2. Fire up a Vault pod on Kubernetes using the official Docker image:
     ```yaml
     kind: ConfigMap
@@ -103,6 +116,9 @@ This assumes that you have a Kubernetes cluster installed and running, and that 
           - name: vault-config
             configMap:
               name: vault-config
+          - name: vault-cert
+            secret:
+              name: vault-cert
     ```
 3. Get the pod name:
     ```shell
@@ -116,7 +132,7 @@ This assumes that you have a Kubernetes cluster installed and running, and that 
     Forwarding from 127.0.0.1:8200 -> 8200
     Forwarding from [::1]:8200 -> 8200
     ```
-5. Install the Vault CLI and server (for dev purposes) on your local machine:
+5. Install the Vault CLI and server (for dev purposes) on your local machine.  You can download Vault as a precompiled binary from [here](https://www.vaultproject.io/downloads.html) or use Homebrew:
     ```shell
     $ brew install vault
     ```
