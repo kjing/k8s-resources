@@ -1,3 +1,156 @@
+# Kubernetes Secrets - not so Secret
+
+Kubernetes [Secrets](http://kubernetes.io/docs/user-guide/secrets/walkthrough/) are base64 encoded name/value pairs. Secrets can be consumed as volumes, or as environment variables. They are very handy to use, but they are not very "secret".  Base64 encoding is solely used so that binary data can be represented, it has no security value or context.
+
+Take this secret.yaml file for example:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  password: bXlzZWN1cmVwYXNzd29yZA==
+```
+
+The password above can be trivially decoded:
+
+```shell
+$ echo -n bXlzZWN1cmVwYXNzd29yZA== | base64 --decode
+mysecurepassword
+```
+
+So if we were to store our configuration files in a repository with public or wide access we would be giving our secrets away.  It should be our goal to **not** store configuration or secrets in our repositories anyway according to the [Twelve Factor Philosophy](https://12factor.net/). So what to do?
+
+### Introducing Vault
+
+Vault is one of many tools that allow secure storage of credentials and keys.  We aren't going to do tool selection here - we are simply going to show you how to use Vault with Kubernetes and Kubernetes Secrets.
+
+If you are unfamiliar with Vault this [tutorial](https://www.vaultproject.io/#/demo/0) is great and takes just 10 minutes.
+
+First off we need Vault up and running.
+
+#### Prerequisites
+
+This assumes that you have a Kubernetes cluster installed and running, and that you have installed the `kubectl` command line tool somewhere in your path.
+
+
+1. Configure a volume for persistent storage.  On Google's cloud this is a simple as:
+    ```shell
+    gcloud compute disks create --size 10gb vault
+    ```
+2. Fire up a Vault pod on Kubernetes using the official Docker image:
+    ```yaml
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: vault-config
+      namespace: default
+    data:
+      # Don't really disable TLS!
+      # This is just to get something up quickly
+      vault.hcl: |
+        backend "file" {
+          path = "/vault/file"
+        }
+
+        listener "tcp" {
+         address = "127.0.0.1:8200"
+         tls_disable = 1
+        }
+    ---
+    kind: Deployment
+    apiVersion: extensions/v1beta1
+    metadata:
+      name: vault
+    spec:
+      replicas: 1
+      template:
+        metadata:
+          labels:
+            app: vault
+        spec:
+          containers:
+          - name: vault
+            # Note IPC_LOCK is required in order for Vault to lock
+            # memory, which prevents it from being swapped to disk.
+            # This is highly recommended for security purposes.
+            securityContext:
+              capabilities:
+                add:
+                - IPC_LOCK
+            image: vault:v0.6.0
+            args:
+            - server
+            ports:
+            - containerPort: 8200
+            resources:
+              requests:
+                cpu: 10m
+                memory: 10Mi
+            volumeMounts:
+              - name: vault-volume
+                mountPath: /vault/file
+              - name: vault-config
+                mountPath: /vault/config
+          restartPolicy: Always
+          volumes:
+          - name: vault-volume
+            gcePersistentDisk:
+              pdName: vault  
+              fsType: ext4
+          - name: vault-config
+            configMap:
+              name: vault-config
+    ```
+3. Get the pod name:
+    ```shell
+    $ kubectl get pods
+    NAME                              READY     STATUS    RESTARTS   AGE
+    vault-2553328298-abktj            1/1       Running   0          15h
+    ```
+4. Use kubectl to establish port forwarding from the pod to your local machine so you can interact with it:
+    ```shell
+    $ kubectl port-forward vault-2553328298-abktj 8200:8200
+    Forwarding from 127.0.0.1:8200 -> 8200
+    Forwarding from [::1]:8200 -> 8200
+    ```
+5. Install the Vault CLI and server (for dev purposes) on your local machine:
+    ```shell
+    $ brew install vault
+    ```
+6. Set your VAULT_ADDR environment variable:
+    ```shell
+    $ export VAULT_ADDR='http://localhost:8200'
+    ```
+7. If all is well you should now be able to interact with the vault installation on Kubernetes:   
+    ```shell
+    $ vault status
+    ```
+8. ==SETUP VAULT==
+9. ==STORE A SECRET==
+8. Now we can directly consume a vault secret locally and turn it into a Kubernetes secret. This is an example of a shell script that we could commit to a public repository and our secret is still very much a **secret**.  
+    ```shell
+    #!/bin/bash
+    PASSWORD="$(vault read -field=value secret/password | base64)"
+
+    # Create YAML object from stdin
+    cat <<EOF | kubectl create -f -
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: mysecret
+    type: Opaque
+    data:
+      password: "${PASSWORD}"
+    EOF
+    ```
+
+
+
+
+
 backend "file" {
   path = "/vault"
 }
@@ -79,7 +232,7 @@ Root Token: 36be02ac-8562-05f0-f1f8-1ff2a468c1b4
 ```
 
 next unseal the vault
-then authentication
+then authenticate
 then use it
 
 ```
@@ -95,4 +248,24 @@ value                  	world
 $ vault list secret
 Keys
 hello
+```
+
+
+
+### Kubernetes Kompanion
+
+Log into Vault
+List secrets (Note secrets can be enumerated and they can have additional variables)
+Using an additional variable to identify the secret name we can create all the keys
+for that grouping and create a secret.
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mssql-secret  #<- Vault variable
+type: Opaque
+data:
+  password: MjdVbXdGWWVmTlVl
+  username: TE1QMkJPeU5sZEI=
 ```
