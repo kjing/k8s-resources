@@ -47,6 +47,10 @@ This assumes that you have a Kubernetes cluster installed and running, and that 
     $ openssl req -x509 -newkey rsa:2048 -nodes -keyout cert/vault.key -out cert/vault.crt -days 730 -subj "/CN=127.0.0.1:8200"
     ```
 
+    Notes: Basically, in order to use TLS in Go, now you MUST specify a CN in the subject field. Wildcards are supported, but '*' does not match '.' If you're using self signed certs or have a closed ecosystem of SSL certs in your environment, it's possible that CN=* or CN=*.example.com might just be fine for you.
+
+    Examine your cert: `openssl x509 -in vault.crt -text -noout`
+
 3. Then create a Kubernetes secret to store the cert:
     ```shell
     $ cd cert
