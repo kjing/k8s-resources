@@ -199,6 +199,8 @@ https://hub.docker.com/_/vault/
 
 https://github.com/hashicorp/vault/pull/1415
 http://www.devoperandi.com/vault-in-kubernetes/
+http://chairnerd.seatgeek.com/secret-management-with-vault/
+
 
 
 Use kubectl to establish local port forwarding:
