@@ -12,7 +12,7 @@ Currently, you can look at:
 
 Tested on version 1.3.2 - 1.3.6
 
-# Ingredients
+## Ingredients
 
 Recommendations:
 * When available we prefer the use of official images.
@@ -21,7 +21,7 @@ Recommendations:
 
 Official Image: N/A
 
-# Preparation
+## Preparation
 
 ### Prerequisites
 

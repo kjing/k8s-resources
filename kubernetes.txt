@@ -1,4 +1,3 @@
-
 # set default zone
 gcloud config set compute/zone us-central1-b
 
@@ -24,3 +23,17 @@ http://10.3.253.108:8080
 
 # delete any clusters you created:
 gcloud container clusters delete example-cluster
+
+
+# Connect to the cluster:
+# --------------------------------------
+
+# Configure kubectl command line access by running the following command:
+gcloud container clusters get-credentials cluster-1 \
+    --zone us-central1-b --project copper-freedom-144020
+
+# Then start a proxy to connect to the Kubernetes control plane:
+kubectl proxy
+
+# Then open the Dashboard interface by navigating to the following location in your browser:
+# http://localhost:8001/ui
