@@ -3,6 +3,10 @@
 This recipe will deploy [traefik](https://docs.traefik.io/) on Kubernetes.  
 
 https://docs.traefik.io/user-guide/kubernetes/
+https://medium.com/@patrickeasters/using-traefik-with-tls-on-kubernetes-cb67fb43a948#.u0ovjuj7y
+https://capgemini.github.io/kubernetes/kube-traefik/
+https://blog.osones.com/en/kubernetes-ingress-controller-with-traefik-and-lets-encrypt.html
+
 
 **Table of Contents**
 
