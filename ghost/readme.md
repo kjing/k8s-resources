@@ -35,7 +35,7 @@ You can also test this using `minikube` if you have it installed locally.
 
 **Tip:** View all the `kubectl` commands, including their options and descriptions in the [kubectl CLI reference](../../docs/user-guide/kubectl/kubectl.md).
 
-### Step One: Setup a data volme <a id="step-one"></a>
+### Step One: Setup a data volome <a id="step-one"></a>
 
 We will need some persistent disk to contain our blog content. We do not want to lose our content if our container restarts!  Covering all the variations of how to do this is outside the scope of this recipe.  This example shows how to do it on the Google Cloud Platform.
 
