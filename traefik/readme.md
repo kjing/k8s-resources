@@ -40,4 +40,31 @@ deployed a node.js based application called Sqlpad.  The application can be used
 
 This example requires a running Kubernetes cluster. First, check that kubectl is properly configured by getting the cluster state:
 
-```console
+
+
+
+### Secure All The Things
+
+We’re just going to generate a self-signed certificate for this tutorial, but any certificate/key pair will work. Run the following command to generate your certificate and dump the certificate and private key.
+
+```
+openssl req \
+        -newkey rsa:2048 -nodes -keyout tls.key \
+        -x509 -days 365 -out tls.crt
+```
+
+Now that we have the certificate, we’ll use kubectl to store it as a secret. We’ll use this so our pods running Traefik can access it.
+
+```
+kubectl create secret -n kube-system generic traefik-cert \
+        --from-file=tls.crt \
+        --from-file=tls.key
+```
+
+
+Now let’s take this configuration and store it in a ConfigMap to be mounted as a volume in the Traefik pods.
+
+
+```
+kubectl create configmap -n kube-system traefik-conf --from-file=traefik.toml
+```

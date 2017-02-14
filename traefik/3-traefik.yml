@@ -7,7 +7,7 @@ metadata:
     app: cheese
     cheese: stilton
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: cheese
@@ -40,7 +40,7 @@ metadata:
     app: cheese
     cheese: cheddar
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: cheese
@@ -73,7 +73,7 @@ metadata:
     app: cheese
     cheese: wensleydale
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: cheese

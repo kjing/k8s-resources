@@ -30,7 +30,10 @@ kind: Service
 metadata:
   name: wensleydale
   annotations:
+    # Annotations can be used on the Kubernetes service to override default behaviour
     traefik.backend.circuitbreaker: "NetworkErrorRatio() > 0.5"
+    traefik.backend.loadbalancer.method: drr   # override the default wrr load balancer algorithm
+    traefik.backend.loadbalancer.sticky: "true"  # enable backend sticky sessions
 spec:
   ports:
   - name: http
