@@ -1,4 +1,4 @@
-FROM phusion/baseimage
+FROM phusion/baseimage:0.9.15
 MAINTAINER Jason Martin <jason@greenpx.co.uk>
 
 # Set environment variables
@@ -179,6 +179,7 @@ RUN curl -sf -o freepbx.tgz -L http://mirror.freepbx.org/modules/packages/freepb
 RUN cd /usr/src/freepbx \
 	&& /etc/init.d/mysql start \
 	&& mkdir /var/www/html \
+	&& a2enmod rewrite \
 	&& /etc/init.d/apache2 start \
 	&& /usr/sbin/asterisk \
 	&& sleep 5 \

@@ -1,0 +1,74 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: freepbx
+  namespace: default
+spec:
+  rules:
+  - host: freepbx.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: freepbx
+          servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: freepbx
+  labels:
+    app: freepbx
+spec:
+  selector:
+    app: freepbx
+  # type: LoadBalancer
+  ports:
+  # - port: 80 # service port
+  #   targetPort: 80  # port on container
+  #   protocol: TCP
+  - port: 80 # service port
+    targetPort: 80  # port on container
+    protocol: TCP
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: freepbx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: freepbx
+  template:
+    metadata:
+      name: freepbx
+      labels:
+        app: freepbx
+    spec:
+      containers:
+      - name: freepbx
+        image: dstroot/freepbx:1.0.0
+        resources:  # http://kubernetes.io/docs/user-guide/compute-resources/
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        # env:
+        # - name: TARGET_SERVICE
+        #   value: prometheus:80
+        # - name: ENABLE_BASIC_AUTH
+        #   value: "true"  # booleans and numbers must be quoted in env values
+        # - name: ENABLE_SSL
+        #   value: "true"
+        ports:
+        - containerPort: 80
+        # # - name: https
+        # - containerPort: 443
+      #   volumeMounts:
+      #   - name: secrets
+      #     mountPath: /etc/secrets
+      #     readOnly: true
+      # volumes:
+      # - name: secrets
+      #   secret:
+      #     secretName: freepbx-secrets

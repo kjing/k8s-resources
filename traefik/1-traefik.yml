@@ -72,3 +72,4 @@ spec:
         - --web.address=:8081
         - --kubernetes
         - --configfile=/config/traefik.toml
+        - --logLevel=DEBUG
