@@ -68,3 +68,5 @@ Now let’s take this configuration and store it in a ConfigMap to be mounted as
 ```
 kubectl create configmap -n kube-system traefik-conf --from-file=traefik.toml
 ```
+
+`echo "$(minikube ip) cheeses.local" | sudo tee -a /etc/hosts`
